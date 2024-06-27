@@ -4,10 +4,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const ViewAllSurveyors = () => {
+  const  api_Url = process.env.REACT_APP_API_URL
   let navigate = useNavigate();
 
   const [allCustomer, setAllCustomer] = useState([]);
-  const admin_jwtToken = sessionStorage.getItem("admin-jwtToken");
+  // const admin_jwtToken = sessionStorage.getItem("admin-jwtToken");
 
   useEffect(() => {
     const getAllUsers = async () => {
@@ -22,7 +23,7 @@ const ViewAllSurveyors = () => {
 
   const retrieveAllUser = async () => {
     const response = await axios.get(
-      "http://localhost:9000/api/user/fetch/all?role=surveyor",
+      `${api_Url}/api/user/fetch/all?role=surveyor`,
       {
         headers: {
           //   Authorization: "Bearer " + admin_jwtToken, // Replace with your actual JWT token

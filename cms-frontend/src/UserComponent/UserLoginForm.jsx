@@ -4,8 +4,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
 const UserLoginForm = () => {
+  const  api_Url = process.env.REACT_APP_API_URL
   let navigate = useNavigate();
-
+console.log( api_Url)
   const [loginRequest, setLoginRequest] = useState({
     emailId: "",
     password: "",
@@ -17,7 +18,7 @@ const UserLoginForm = () => {
   };
 
   const loginAction = (e) => {
-    fetch("http://localhost:9000/api/user/login", {
+    fetch(`${api_Url}/api/user/login`, {
       method: "POST",
       headers: {
         Accept: "application/json",

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 
 const ViewMyClaims = () => {
+  const  api_Url = process.env.REACT_APP_API_URL;
   let navigate = useNavigate();
   const customer = JSON.parse(sessionStorage.getItem("active-customer"));
 
@@ -24,7 +25,7 @@ const ViewMyClaims = () => {
 
   const retrieveApplication = async () => {
     const response = await axios.get(
-      "http://localhost:9000/api/claim/fetch/customer-wise?customerId=" +
+      `${api_Url}/api/claim/fetch/customer-wise?customerId=` +
         customer.id,
       {
         headers: {
@@ -44,7 +45,7 @@ const ViewMyClaims = () => {
   };
 
   const updateMyClaim = (claimId, status) => {
-    fetch("http://localhost:9000/api/claim/customer/response", {
+    fetch(`${api_Url}/api/claim/customer/response`, {
       method: "PUT",
       headers: {
         Accept: "application/json",

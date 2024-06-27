@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
 const AddPolicyForm = () => {
+  const  api_Url = process.env.REACT_APP_API_URL
   let navigate = useNavigate();
 
   const [addRequest, setAddRequest] = useState({
@@ -69,7 +70,7 @@ const AddPolicyForm = () => {
       alert("Please add the Coverage Details!!!");
     } else {
       addRequest.coverageDetails = coverageDetails;
-      fetch("http://localhost:9000/api/policy/add", {
+      fetch(`${api_Url}/api/policy/add`, {
         method: "POST",
         headers: {
           Accept: "application/json",

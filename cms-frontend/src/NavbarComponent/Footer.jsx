@@ -153,8 +153,8 @@ const Footer = () => {
 
           <div class="text-center text-color">
             © 2023 Copyright:
-            <a class="text-color-3" href="https://codewithmurad.com/">
-              codewithmurad.com
+            <a class="text-color-3" href="https://rjaytechnologies.com/">
+            rjaytechnologies.com
             </a>
           </div>
         </footer>

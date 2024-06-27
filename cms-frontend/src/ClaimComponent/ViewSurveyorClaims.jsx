@@ -6,6 +6,7 @@ import { Button, Modal } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 
 const ViewSurveyorClaims = () => {
+  const  api_Url = process.env.REACT_APP_API_URL;
   let navigate = useNavigate();
   const surveyor = JSON.parse(sessionStorage.getItem("active-surveyor"));
 
@@ -40,7 +41,7 @@ const ViewSurveyorClaims = () => {
 
   const retrieveApplication = async () => {
     const response = await axios.get(
-      "http://localhost:9000/api/claim/fetch/surveyor-wise?surveyorId=" +
+      `${api_Url}/api/claim/fetch/surveyor-wise?surveyorId=` +
         surveyor.id,
       {
         headers: {
@@ -69,7 +70,7 @@ const ViewSurveyorClaims = () => {
     } else if (actionStatus === "Approved" && amtApprovedBySurveyor === "") {
       alert("Please select the Claim Approved amount!!!");
     } else {
-      fetch("http://localhost:9000/api/claim/surveyor/update", {
+      fetch(`${api_Url}/api/claim/surveyor/update`, {
         method: "PUT",
         headers: {
           Accept: "application/json",

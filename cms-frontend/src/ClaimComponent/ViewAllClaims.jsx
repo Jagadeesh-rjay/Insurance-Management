@@ -6,6 +6,8 @@ import { Button, Modal } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 
 const ViewAllClaims = () => {
+
+  const  api_Url = process.env.REACT_APP_API_URL;
   let navigate = useNavigate();
   const customer = JSON.parse(sessionStorage.getItem("active-customer"));
 
@@ -31,7 +33,7 @@ const ViewAllClaims = () => {
 
   const retrieveAllUser = async () => {
     const response = await axios.get(
-      "http://localhost:9000/api/user/fetch/all?role=surveyor",
+      `${api_Url}/api/user/fetch/all?role=surveyor`,
       {
         headers: {
           //   Authorization: "Bearer " + admin_jwtToken, // Replace with your actual JWT token

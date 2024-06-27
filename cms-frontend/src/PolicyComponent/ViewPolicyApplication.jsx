@@ -4,6 +4,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const ViewPolicyApplication = () => {
+  const  api_Url = process.env.REACT_APP_API_URL
   let navigate = useNavigate();
   const customer = JSON.parse(sessionStorage.getItem("active-customer"));
 
@@ -23,7 +24,7 @@ const ViewPolicyApplication = () => {
 
   const retrieveApplication = async () => {
     const response = await axios.get(
-      "http://localhost:9000/api/policy/application/fetch/customer-wise?customerId=" +
+      `${api_Url}/api/policy/application/fetch/customer-wise?customerId=` +
         customer.id,
       {
         headers: {

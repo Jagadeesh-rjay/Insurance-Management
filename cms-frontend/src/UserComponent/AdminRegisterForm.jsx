@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
 const AdminRegisterForm = () => {
+  const  api_Url = process.env.REACT_APP_API_URL
   let navigate = useNavigate();
   const admin_jwtToken = sessionStorage.getItem("admin-jwtToken");
 
@@ -14,7 +15,7 @@ const AdminRegisterForm = () => {
   };
 
   const registerAdmin = (e) => {
-    fetch("http://localhost:9000/api/user/admin/register", {
+    fetch(`${api_Url}/api/user/admin/register`, {
       method: "POST",
       headers: {
         Accept: "application/json",

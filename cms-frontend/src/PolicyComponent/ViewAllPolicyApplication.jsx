@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Button, Modal } from "react-bootstrap";
 
 const ViewAllPolicyApplication = () => {
+  const  api_Url = process.env.REACT_APP_API_URL
   let navigate = useNavigate();
   const customer = JSON.parse(sessionStorage.getItem("active-customer"));
 
@@ -38,7 +39,7 @@ const ViewAllPolicyApplication = () => {
 
   const retrieveApplication = async () => {
     const response = await axios.get(
-      "http://localhost:9000/api/policy/application/fetch/all",
+      `${api_Url}/api/policy/application/fetch/all`,
       {
         headers: {
           //   Authorization: "Bearer " + admin_jwtToken, // Replace with your actual JWT token
@@ -62,7 +63,7 @@ const ViewAllPolicyApplication = () => {
     startDate,
     endDate
   ) => {
-    fetch("http://localhost:9000/api/policy/application/status/update", {
+    fetch(`${api_Url}/api/policy/application/status/update`, {
       method: "PUT",
       headers: {
         Accept: "application/json",

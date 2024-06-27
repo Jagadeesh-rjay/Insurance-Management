@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const PolicyDetail = () => {
+  const  api_Url = process.env.REACT_APP_API_URL
   let navigate = useNavigate();
 
   const { policyId } = useParams();
@@ -16,7 +17,7 @@ const PolicyDetail = () => {
 
   const retrievePolicy = async () => {
     const response = await axios.get(
-      "http://localhost:9000/api/policy/fetch?policyId=" + policyId
+      `${api_Url}/api/policy/fetch?policyId=` + policyId
     );
     return response.data;
   };
@@ -35,7 +36,7 @@ const PolicyDetail = () => {
     if (!customer) {
       alert("Please login as Customer");
     } else {
-      fetch("http://localhost:9000/api/policy/application/add", {
+      fetch(`${api_Url}/api/policy/application/add`, {
         method: "POST",
         headers: {
           Accept: "application/json",

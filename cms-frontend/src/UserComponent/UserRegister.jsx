@@ -4,6 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const UserRegister = () => {
+  const  api_Url = process.env.REACT_APP_API_URL
   const navigate = useNavigate();
 
   const [user, setUser] = useState({
@@ -42,7 +43,7 @@ const UserRegister = () => {
     if (user.gender === "") {
       alert("Select Gender");
     } else {
-      fetch("http://localhost:9000/api/user/register", {
+      fetch(`${api_Url}/api/user/register`, {
         method: "POST",
         headers: {
           Accept: "application/json",

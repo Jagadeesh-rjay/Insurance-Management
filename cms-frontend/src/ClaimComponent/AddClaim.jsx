@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
 const AddClaim = () => {
+  const  api_Url = process.env.REACT_APP_API_URL;
   let navigate = useNavigate();
   const location = useLocation();
   var application = location.state;
@@ -20,7 +21,7 @@ const AddClaim = () => {
   };
 
   const addClaim = (e) => {
-    fetch("http://localhost:9000/api/claim/add", {
+    fetch(`${api_Url}/api/claim/add`, {
       method: "POST",
       headers: {
         Accept: "application/json",

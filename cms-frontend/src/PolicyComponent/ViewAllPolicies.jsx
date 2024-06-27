@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const ViewAllPolicies = () => {
+  const  api_Url = process.env.REACT_APP_API_URL
   let navigate = useNavigate();
 
   const [applications, setApplications] = useState([]);
@@ -23,7 +24,7 @@ const ViewAllPolicies = () => {
 
   const retrieveApplication = async () => {
     const response = await axios.get(
-      "http://localhost:9000/api/policy/fetch/all"
+      `${api_Url}/api/policy/fetch/all`
     );
     return response.data;
   };
@@ -40,7 +41,7 @@ const ViewAllPolicies = () => {
   };
 
   const deletePolicy = (policyId) => {
-    fetch("http://localhost:9000/api/policy/delete?policyId=" + policyId, {
+    fetch(`${api_Url}/api/policy/delete?policyId=` + policyId, {
       method: "DELETE",
       headers: {
         Accept: "application/json",

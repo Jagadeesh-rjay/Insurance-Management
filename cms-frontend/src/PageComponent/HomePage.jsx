@@ -6,13 +6,14 @@ import { useNavigate } from "react-router-dom";
 import PolicyCard from "../PolicyComponent/PolicyCard";
 
 const HomePage = () => {
+  const  api_Url = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
   const [policies, setPolicies] = useState([]);
 
   const retrieveAllPolicy = async () => {
     const response = await axios.get(
-      "http://localhost:9000/api/policy/fetch/all"
+      `${api_Url}/api/policy/fetch/all`
     );
     return response.data;
   };
