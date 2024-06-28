@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import React from "react";
 import { useNavigate } from "react-router-dom";
@@ -6,18 +6,14 @@ import { Button, Modal } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 
 const ViewSurveyorClaims = () => {
-  const  api_Url = process.env.REACT_APP_API_URL;
+  const api_Url = process.env.REACT_APP_API_URL;
   let navigate = useNavigate();
   const surveyor = JSON.parse(sessionStorage.getItem("active-surveyor"));
 
   const [applications, setApplications] = useState([]);
-  const admin_jwtToken = sessionStorage.getItem("surveyor-jwtToken");
-
   const [actionStatus, setActionStatus] = useState("");
   const [amtApprovedBySurveyor, setAmtApprovedBySurveyor] = useState("");
-
   const [claim, setClaim] = useState("");
-
   const [showModal, setShowModal] = useState(false);
 
   const handleClose = () => setShowModal(false);
@@ -28,6 +24,19 @@ const ViewSurveyorClaims = () => {
     handleShow();
   };
 
+  const retrieveApplication = useCallback(async () => {
+    const response = await axios.get(
+      `${api_Url}/api/claim/fetch/surveyor-wise?surveyorId=${surveyor.id}`,
+      {
+        headers: {
+          // Authorization: "Bearer " + admin_jwtToken, // Replace with your actual JWT token
+        },
+      }
+    );
+    console.log(response.data);
+    return response.data;
+  }, [api_Url, surveyor.id]);
+
   useEffect(() => {
     const getApplication = async () => {
       const application = await retrieveApplication();
@@ -37,21 +46,7 @@ const ViewSurveyorClaims = () => {
     };
 
     getApplication();
-  }, []);
-
-  const retrieveApplication = async () => {
-    const response = await axios.get(
-      `${api_Url}/api/claim/fetch/surveyor-wise?surveyorId=` +
-        surveyor.id,
-      {
-        headers: {
-          //   Authorization: "Bearer " + admin_jwtToken, // Replace with your actual JWT token
-        },
-      }
-    );
-    console.log(response.data);
-    return response.data;
-  };
+  }, [retrieveApplication]);
 
   const formatDateFromEpoch = (epochTime) => {
     const date = new Date(Number(epochTime));
@@ -63,11 +58,9 @@ const ViewSurveyorClaims = () => {
   const updateClaim = (e) => {
     e.preventDefault();
 
-    let data;
-
     if (actionStatus === "") {
       alert("Please select the Claim Status");
-    } else if (actionStatus === "Approved" && amtApprovedBySurveyor === "") {
+    } else if (actionStatus === "Accepted" && amtApprovedBySurveyor === "") {
       alert("Please select the Claim Approved amount!!!");
     } else {
       fetch(`${api_Url}/api/claim/surveyor/update`, {
@@ -98,7 +91,7 @@ const ViewSurveyorClaims = () => {
 
               setTimeout(() => {
                 navigate("/home");
-              }, 2000); // Redirect after 3 seconds
+              }, 2000); // Redirect after 2 seconds
             } else {
               toast.error(res.responseMessage, {
                 position: "top-center",
@@ -167,79 +160,60 @@ const ViewSurveyorClaims = () => {
                 </tr>
               </thead>
               <tbody>
-                {applications.map((application) => {
-                  return (
-                    <tr>
-                      <td>
-                        <b>{application.policy.name}</b>
-                      </td>
-                      <td>
-                        <b>
-                          {application.customer.firstName +
-                            " " +
-                            application.customer.lastName}
-                        </b>
-                      </td>
-                      <td>
-                        <b>
-                          {formatDateFromEpoch(
-                            application.claim.claimApplicationDate
-                          )}
-                        </b>
-                      </td>
-                      <td>
-                        <b>{application.claim.claimAmount}</b>
-                      </td>
-                      <td>
-                        <b>
-                          <b>{application.claim.dateOfAccident}</b>
-                        </b>
-                      </td>
-
-                      <td>
-                        <b>
-                          {!application.claim.amtApprovedBySurveyor
-                            ? "NA"
-                            : application.claim.amtApprovedBySurveyor}
-                        </b>
-                      </td>
-                      <td>
-                        <b>
-                          <b>{application.claim.claimStatus}</b>
-                        </b>
-                      </td>
-                      <td>
-                        <b>
-                          <b>{application.claim.actionStatus}</b>
-                        </b>
-                      </td>
-                      <td>
-                        <b>
-                          <b>{application.claim.customerClaimResponse}</b>
-                        </b>
-                      </td>
-                      <td>
-                        {(() => {
-                          if (
-                            application.claim.actionStatus ===
-                            "Assigned to Surveyor"
-                          ) {
-                            return (
-                              <button
-                                onClick={() =>
-                                  updateClaimStatus(application.claim)
-                                }
-                                className="btn btn-sm bg-color custom-bg-text"
-                              >
-                                <b>Update Status</b>
-                              </button>
-                            );
-                          }
-                        })()}
-                      </td>
-                    </tr>
-                  );
-                })}
+                {applications.map((application) => (
+                  <tr key={application.claim.id}>
+                    <td>
+                      <b>{application.policy.name}</b>
+                    </td>
+                    <td>
+                      <b>
+                        {application.customer.firstName +
+                          " " +
+                          application.customer.lastName}
+                      </b>
+                    </td>
+                    <td>
+                      <b>
+                        {formatDateFromEpoch(
+                          application.claim.claimApplicationDate
+                        )}
+                      </b>
+                    </td>
+                    <td>
+                      <b>{application.claim.claimAmount}</b>
+                    </td>
+                    <td>
+                      <b>{application.claim.dateOfAccident}</b>
+                    </td>
+                    <td>
+                      <b>
+                        {!application.claim.amtApprovedBySurveyor
+                          ? "NA"
+                          : application.claim.amtApprovedBySurveyor}
+                      </b>
+                    </td>
+                    <td>
+                      <b>{application.claim.claimStatus}</b>
+                    </td>
+                    <td>
+                      <b>{application.claim.actionStatus}</b>
+                    </td>
+                    <td>
+                      <b>{application.claim.customerClaimResponse}</b>
+                    </td>
+                    <td>
+                      {application.claim.actionStatus ===
+                      "Assigned to Surveyor" ? (
+                        <button
+                          onClick={() => updateClaimStatus(application.claim)}
+                          className="btn btn-sm bg-color custom-bg-text"
+                        >
+                          <b>Update Status</b>
+                        </button>
+                      ) : null}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -260,7 +234,7 @@ const ViewSurveyorClaims = () => {
           <div className="ms-3 mt-3 mb-3 me-3">
             <form>
               <div className="mb-3">
-                <label for="emailId" class="form-label">
+                <label htmlFor="emailId" className="form-label">
                   <b>Claim Application Date</b>
                 </label>
                 <input
@@ -271,7 +245,7 @@ const ViewSurveyorClaims = () => {
                 />
               </div>
               <div className="mb-3">
-                <label for="emailId" class="form-label">
+                <label htmlFor="emailId" className="form-label">
                   <b>Accident Date</b>
                 </label>
                 <input
@@ -283,7 +257,7 @@ const ViewSurveyorClaims = () => {
               </div>
 
               <div className="mb-3">
-                <label for="emailId" class="form-label">
+                <label htmlFor="emailId" className="form-label">
                   <b>Customer Claim Amount</b>
                 </label>
                 <input
@@ -294,9 +268,9 @@ const ViewSurveyorClaims = () => {
                 />
               </div>
 
-              <div className=" mb-3">
+              <div className="mb-3">
                 <label className="form-label">
-                  <b>CLaim Status</b>
+                  <b>Claim Status</b>
                 </label>
 
                 <select
@@ -309,31 +283,25 @@ const ViewSurveyorClaims = () => {
                 </select>
               </div>
 
-              {(() => {
-                if (actionStatus === "Accepted") {
-                  return (
-                    <div className="mb-3">
-                      <label for="emailId" class="form-label">
-                        <b>Approved Amount</b>
-                      </label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        onChange={(e) =>
-                          setAmtApprovedBySurveyor(e.target.value)
-                        }
-                        value={amtApprovedBySurveyor}
-                      />
-                    </div>
-                  );
-                }
-              })()}
+              {actionStatus === "Accepted" && (
+                <div className="mb-3">
+                  <label htmlFor="emailId" className="form-label">
+                    <b>Approved Amount</b>
+                  </label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    onChange={(e) => setAmtApprovedBySurveyor(e.target.value)}
+                    value={amtApprovedBySurveyor}
+                  />
+                </div>
+              )}
 
               <div className="d-flex aligns-items-center justify-content-center mb-2">
                 <button
                   type="submit"
                   onClick={updateClaim}
-                  class="btn bg-color custom-bg-text"
+                  className="btn bg-color custom-bg-text"
                 >
                   Update Claim Status
                 </button>

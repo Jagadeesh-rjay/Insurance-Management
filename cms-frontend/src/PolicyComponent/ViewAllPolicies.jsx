@@ -1,40 +1,27 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const ViewAllPolicies = () => {
-  const  api_Url = process.env.REACT_APP_API_URL
+  const api_Url = process.env.REACT_APP_API_URL;
   let navigate = useNavigate();
 
   const [applications, setApplications] = useState([]);
-  //const admin_jwtToken = sessionStorage.getItem("admin-jwtToken");
 
   useEffect(() => {
-    const getApplication = async () => {
-      const application = await retrieveApplication();
-      if (application) {
-        setApplications(application.policies);
+    const retrieveApplication = async () => {
+      try {
+        const response = await axios.get(`${api_Url}/api/policy/fetch/all`);
+        setApplications(response.data.policies);
+      } catch (error) {
+        console.error("Error retrieving policies:", error);
+        // Handle error (e.g., show error message)
       }
     };
 
-    getApplication();
-  }, []);
-
-  const retrieveApplication = async () => {
-    const response = await axios.get(
-      `${api_Url}/api/policy/fetch/all`
-    );
-    return response.data;
-  };
-
-  const formatDateFromEpoch = (epochTime) => {
-    const date = new Date(Number(epochTime));
-    const formattedDate = date.toLocaleString(); // Adjust the format as needed
-
-    return formattedDate;
-  };
+    retrieveApplication();
+  }, [api_Url]);
 
   const viewPolicy = (policy) => {
     navigate(`/policy/${policy.id}/detail`);
@@ -64,7 +51,7 @@ const ViewAllPolicies = () => {
 
             setTimeout(() => {
               window.location.reload(true);
-            }, 1000); // Redirect after 3 seconds
+            }, 1000);
           } else {
             toast.error(res.responseMessage, {
               position: "top-center",
@@ -131,7 +118,7 @@ const ViewAllPolicies = () => {
               <tbody>
                 {applications.map((policy) => {
                   return (
-                    <tr>
+                    <tr key={policy.id}>
                       <td>
                         <b>{policy.name}</b>
                       </td>

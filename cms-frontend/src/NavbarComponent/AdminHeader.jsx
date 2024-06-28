@@ -9,7 +9,7 @@ const AdminHeader = () => {
   console.log(user);
 
   const adminLogout = () => {
-    toast.success("logged out!!!", {
+    toast.success("Logged out!!!", {
       position: "top-center",
       autoClose: 1000,
       hideProgressBar: false,
@@ -20,91 +20,94 @@ const AdminHeader = () => {
     });
     sessionStorage.removeItem("active-admin");
     sessionStorage.removeItem("admin-jwtToken");
-    window.location.reload(true);
+    window.reload(true);
+    // Redirect after the toast has been shown
     setTimeout(() => {
       navigate("/home");
-    }, 2000); // Redirect after 3 seconds
+    }, 1000); 
+    // Delay matches the toast autoClose duration
   };
+
   return (
-    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 me-5">
-      <li class="nav-item">
+    <ul className="navbar-nav ms-auto mb-2 mb-lg-0 me-5">
+      <li className="nav-item">
         <Link
           to="/admin/policy/add"
-          class="nav-link active"
+          className="nav-link active"
           aria-current="page"
         >
           <b className="text-color">Add Policy</b>
         </Link>
       </li>
-      <li class="nav-item">
+      <li className="nav-item">
         <Link
           to="/admin/policy/view/all"
-          class="nav-link active"
+          className="nav-link active"
           aria-current="page"
         >
           <b className="text-color">Policies</b>
         </Link>
       </li>
-      <li class="nav-item">
+      <li className="nav-item">
         <Link
           to="/admin/customer/policy/application/all"
-          class="nav-link active"
+          className="nav-link active"
           aria-current="page"
         >
           <b className="text-color">Applications</b>
         </Link>
       </li>
-      <li class="nav-item">
+      <li className="nav-item">
         <Link
           to="/admin/policy/claim/view"
-          class="nav-link active"
+          className="nav-link active"
           aria-current="page"
         >
           <b className="text-color">Claims</b>
         </Link>
       </li>
-      <li class="nav-item">
+      <li className="nav-item">
         <Link
           to="/user/admin/register"
-          class="nav-link active"
+          className="nav-link active"
           aria-current="page"
         >
           <b className="text-color">Register Admin</b>
         </Link>
       </li>
-      <li class="nav-item">
+      <li className="nav-item">
         <Link
           to="/user/surveyor/register"
-          class="nav-link active"
+          className="nav-link active"
           aria-current="page"
         >
           <b className="text-color">Register Surveyor</b>
         </Link>
       </li>
 
-      <li class="nav-item">
+      <li className="nav-item">
         <Link
           to="/admin/customer/all"
-          class="nav-link active"
+          className="nav-link active"
           aria-current="page"
         >
           <b className="text-color"> Customers</b>
         </Link>
       </li>
-      <li class="nav-item">
+      <li className="nav-item">
         <Link
           to="/admin/surveyor/all"
-          class="nav-link active"
+          className="nav-link active"
           aria-current="page"
         >
           <b className="text-color"> Surveyors</b>
         </Link>
       </li>
 
-      <li class="nav-item">
+      <li className="nav-item">
         <Link
           to=""
-          class="nav-link active"
+          className="nav-link active"
           aria-current="page"
           onClick={adminLogout}
         >

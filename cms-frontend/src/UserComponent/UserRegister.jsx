@@ -4,7 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const UserRegister = () => {
-  const  api_Url = process.env.REACT_APP_API_URL
+  const api_Url = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
   const [user, setUser] = useState({
@@ -22,14 +22,15 @@ const UserRegister = () => {
   });
 
   useEffect(() => {
-    if (document.URL.indexOf("customer") != -1) {
-      user.role = "customer";
-    } else if (document.URL.indexOf("surveyor") != -1) {
-      user.role = "surveyor";
-    } else if (document.URL.indexOf("irda") != -1) {
-      user.role = "irda";
+    if (document.URL.indexOf("customer") !== -1) {
+      setUser({ ...user, role: "customer" });
+    } else if (document.URL.indexOf("surveyor") !== -1) {
+      setUser({ ...user, role: "surveyor" });
+    } else if (document.URL.indexOf("irda") !== -1) {
+      setUser({ ...user, role: "irda" });
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const handleUserInput = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
@@ -37,8 +38,6 @@ const UserRegister = () => {
 
   const saveUser = (e) => {
     e.preventDefault();
-
-    let jwtToken;
 
     if (user.gender === "") {
       alert("Select Gender");
@@ -48,8 +47,7 @@ const UserRegister = () => {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-
-          //    Authorization: "Bearer " + jwtToken,
+          // Authorization: "Bearer " + jwtToken, // Uncomment if jwtToken is used
         },
         body: JSON.stringify(user),
       })
@@ -70,22 +68,8 @@ const UserRegister = () => {
               setTimeout(() => {
                 navigate("/user/login");
               }, 1000);
-            } else if (!res.success) {
-              toast.error(res.responseMessage, {
-                position: "top-center",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-              });
-
-              setTimeout(() => {
-                window.location.reload(true);
-              }, 1000); // Redirect after 3 seconds
             } else {
-              toast.error("It seems server is down", {
+              toast.error(res.responseMessage || "It seems server is down", {
                 position: "top-center",
                 autoClose: 1000,
                 hideProgressBar: false,

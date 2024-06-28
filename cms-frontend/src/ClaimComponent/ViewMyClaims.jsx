@@ -1,16 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
 const ViewMyClaims = () => {
-  const  api_Url = process.env.REACT_APP_API_URL;
-  let navigate = useNavigate();
+  const api_Url = process.env.REACT_APP_API_URL;
   const customer = JSON.parse(sessionStorage.getItem("active-customer"));
 
   const [applications, setApplications] = useState([]);
-  const admin_jwtToken = sessionStorage.getItem("admin-jwtToken");
+
+  const retrieveApplication = useCallback(async () => {
+    const response = await axios.get(
+      `${api_Url}/api/claim/fetch/customer-wise?customerId=${customer.id}`,
+      {
+        headers: {
+          // Authorization: "Bearer " + admin_jwtToken, // Replace with your actual JWT token
+        },
+      }
+    );
+    console.log(response.data);
+    return response.data;
+  }, [api_Url, customer.id]);
 
   useEffect(() => {
     const getApplication = async () => {
@@ -21,21 +31,7 @@ const ViewMyClaims = () => {
     };
 
     getApplication();
-  }, []);
-
-  const retrieveApplication = async () => {
-    const response = await axios.get(
-      `${api_Url}/api/claim/fetch/customer-wise?customerId=` +
-        customer.id,
-      {
-        headers: {
-          //   Authorization: "Bearer " + admin_jwtToken, // Replace with your actual JWT token
-        },
-      }
-    );
-    console.log(response.data);
-    return response.data;
-  };
+  }, [retrieveApplication]);
 
   const formatDateFromEpoch = (epochTime) => {
     const date = new Date(Number(epochTime));
@@ -70,7 +66,7 @@ const ViewMyClaims = () => {
             });
             setTimeout(() => {
               window.location.href = "/home";
-            }, 1000); // Redirect after 3 seconds
+            }, 1000); // Redirect after 1 second
           } else {
             toast.error(res.responseMessage, {
               position: "top-center",
@@ -137,91 +133,59 @@ const ViewMyClaims = () => {
                 </tr>
               </thead>
               <tbody>
-                {applications.map((application) => {
-                  return (
-                    <tr>
-                      <td>
-                        <b>{application.policy.name}</b>
-                      </td>
-                      <td>
-                        <b>
-                          {formatDateFromEpoch(
-                            application.claim.claimApplicationDate
-                          )}
-                        </b>
-                      </td>
-                      <td>
-                        <b>{application.claim.claimAmount}</b>
-                      </td>
-                      <td>
-                        <b>
-                          <b>{application.claim.dateOfAccident}</b>
-                        </b>
-                      </td>
+                {applications.map((application) => (
+                  <tr key={application.claim.id}>
+                    <td>
+                      <b>{application.policy.name}</b>
+                    </td>
+                    <td>
+                      <b>{formatDateFromEpoch(application.claim.claimApplicationDate)}</b>
+                    </td>
+                    <td>
+                      <b>{application.claim.claimAmount}</b>
+                    </td>
+                    <td>
+                      <b>{application.claim.dateOfAccident}</b>
+                    </td>
+                    <td>
+                      <b>{application.claim.amtApprovedBySurveyor || "NA"}</b>
+                    </td>
+                    <td>
+                      <b>{application.claim.claimStatus}</b>
+                    </td>
+                    <td>
+                      <b>{application.claim.actionStatus}</b>
+                    </td>
+                    <td>
+                      <b>{application.claim.customerClaimResponse}</b>
+                    </td>
+                    <td>
+                      {application.claim.claimStatus === "Open" && (
+                        <div>
+                          <button
+                            onClick={() => updateMyClaim(application.claim.id, "Accept")}
+                            className="btn btn-sm bg-success text-dark"
+                          >
+                            <b>Accept</b>
+                          </button>
 
-                      <td>
-                        <b>
-                          {!application.claim.amtApprovedBySurveyor
-                            ? "NA"
-                            : application.claim.amtApprovedBySurveyor}
-                        </b>
-                      </td>
-                      <td>
-                        <b>
-                          <b>{application.claim.claimStatus}</b>
-                        </b>
-                      </td>
-                      <td>
-                        <b>
-                          <b>{application.claim.actionStatus}</b>
-                        </b>
-                      </td>
-                      <td>
-                        <b>
-                          <b>{application.claim.customerClaimResponse}</b>
-                        </b>
-                      </td>
-                      <td>
-                        {(() => {
-                          if (application.claim.claimStatus === "Open") {
-                            return (
-                              <div>
-                                <button
-                                  onClick={() =>
-                                    updateMyClaim(
-                                      application.claim.id,
-                                      "Accept"
-                                    )
-                                  }
-                                  className="btn btn-sm bg-success text-dark"
-                                >
-                                  <b> Accept</b>
-                                </button>
-
-                                <button
-                                  onClick={() =>
-                                    updateMyClaim(
-                                      application.claim.id,
-                                      "Withdraw"
-                                    )
-                                  }
-                                  className="btn btn-sm bg-danger text-white"
-                                >
-                                  <b> Withdraw</b>
-                                </button>
-                              </div>
-                            );
-                          }
-                        })()}
-                      </td>
-                    </tr>
-                  );
-                })}
+                          <button
+                            onClick={() => updateMyClaim(application.claim.id, "Withdraw")}
+                            className="btn btn-sm bg-danger text-white"
+                          >
+                            <b>Withdraw</b>
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

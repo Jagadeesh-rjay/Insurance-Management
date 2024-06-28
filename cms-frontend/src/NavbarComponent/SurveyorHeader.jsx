@@ -20,10 +20,10 @@ const SurveyorHeader = () => {
     });
     sessionStorage.removeItem("active-surveyor");
     sessionStorage.removeItem("surveyor-jwtToken");
-    window.location.reload(true);
+    window.reload(true);
     setTimeout(() => {
       navigate("/home");
-    }, 2000); // Redirect after 3 seconds
+    }, 1000); // Redirect after 3 seconds
   };
   return (
     <ul class="navbar-nav ms-auto mb-2 mb-lg-0 me-5">

@@ -1,58 +1,50 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Modal } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 
 const ViewAllClaims = () => {
-
-  const  api_Url = process.env.REACT_APP_API_URL;
+  const api_Url = process.env.REACT_APP_API_URL;
   let navigate = useNavigate();
-  const customer = JSON.parse(sessionStorage.getItem("active-customer"));
 
   const [applications, setApplications] = useState([]);
-  const admin_jwtToken = sessionStorage.getItem("admin-jwtToken");
-
   const [surveyorId, setSurveyorId] = useState("");
-
   const [surveyors, setSurveyors] = useState([]);
-
   const [claimId, setClaimId] = useState("");
-
-  useEffect(() => {
-    const getAllUsers = async () => {
-      const allUsers = await retrieveAllUser();
-      if (allUsers) {
-        setSurveyors(allUsers.users);
-      }
-    };
-
-    getAllUsers();
-  }, []);
-
-  const retrieveAllUser = async () => {
-    const response = await axios.get(
-      `${api_Url}/api/user/fetch/all?role=surveyor`,
-      {
-        headers: {
-          //   Authorization: "Bearer " + admin_jwtToken, // Replace with your actual JWT token
-        },
-      }
-    );
-    console.log(response.data);
-    return response.data;
-  };
-
   const [showModal, setShowModal] = useState(false);
 
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
 
-  const assignClaimId = (claimId, e) => {
-    setClaimId(claimId);
-    handleShow();
-  };
+  const retrieveAllUser = useCallback(async () => {
+    try {
+      const response = await axios.get(`${api_Url}/api/user/fetch/all?role=surveyor`);
+      console.log(response.data);
+      setSurveyors(response.data.users);
+    } catch (error) {
+      console.error("Error fetching surveyors:", error);
+    }
+  }, [api_Url]);
+
+  useEffect(() => {
+    const getAllUsers = async () => {
+      await retrieveAllUser();
+    };
+
+    getAllUsers();
+  }, [retrieveAllUser]);
+
+  const retrieveApplication = useCallback(async () => {
+    try {
+      const response = await axios.get(`${api_Url}/api/claim/fetch/all`);
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching applications:", error);
+      return null;
+    }
+  }, [api_Url]);
 
   useEffect(() => {
     const getApplication = async () => {
@@ -63,36 +55,23 @@ const ViewAllClaims = () => {
     };
 
     getApplication();
-  }, []);
-
-  const retrieveApplication = async () => {
-    const response = await axios.get(
-      "http://localhost:9000/api/claim/fetch/all",
-      {
-        headers: {
-          //   Authorization: "Bearer " + admin_jwtToken, // Replace with your actual JWT token
-        },
-      }
-    );
-    console.log(response.data);
-    return response.data;
-  };
+  }, [retrieveApplication]);
 
   const formatDateFromEpoch = (epochTime) => {
     const date = new Date(Number(epochTime));
     const formattedDate = date.toLocaleString(); // Adjust the format as needed
-
     return formattedDate;
   };
 
-  const claimPolicy = (application) => {
-    navigate("/customer/policy/claim", { state: application });
+  const assignClaimId = (claimId) => {
+    setClaimId(claimId);
+    handleShow();
   };
 
   const updateClaim = (e) => {
     e.preventDefault();
 
-    fetch("http://localhost:9000/api/claim/assign/surveyor", {
+    fetch(`${api_Url}/api/claim/assign/surveyor`, {
       method: "PUT",
       headers: {
         Accept: "application/json",
@@ -119,7 +98,7 @@ const ViewAllClaims = () => {
 
             setTimeout(() => {
               navigate("/home");
-            }, 2000); // Redirect after 3 seconds
+            }, 2000); // Redirect after 2 seconds
           } else {
             toast.error(res.responseMessage, {
               position: "top-center",
@@ -149,27 +128,11 @@ const ViewAllClaims = () => {
 
   return (
     <div className="mt-3">
-      <div
-        className="card form-card ms-2 me-2 mb-5 custom-bg"
-        style={{
-          height: "45rem",
-        }}
-      >
-        <div
-          className="card-header custom-bg-text text-center bg-color"
-          style={{
-            borderRadius: "1em",
-            height: "50px",
-          }}
-        >
+      <div className="card form-card ms-2 me-2 mb-5 custom-bg" style={{ height: "45rem" }}>
+        <div className="card-header custom-bg-text text-center bg-color" style={{ borderRadius: "1em", height: "50px" }}>
           <h2>All Claims</h2>
         </div>
-        <div
-          className="card-body"
-          style={{
-            overflowY: "auto",
-          }}
-        >
+        <div className="card-body" style={{ overflowY: "auto" }}>
           <div className="table-responsive">
             <table className="table text-color text-center">
               <thead className="table-bordered border-color bg-color custom-bg-text">
@@ -187,76 +150,29 @@ const ViewAllClaims = () => {
                 </tr>
               </thead>
               <tbody>
-                {applications.map((application) => {
-                  return (
-                    <tr>
-                      <td>
-                        <b>{application.policy.name}</b>
-                      </td>
-                      <td>
-                        <b>
-                          {application.customer.firstName +
-                            " " +
-                            application.customer.lastName}
-                        </b>
-                      </td>
-                      <td>
-                        <b>
-                          {formatDateFromEpoch(
-                            application.claim.claimApplicationDate
-                          )}
-                        </b>
-                      </td>
-                      <td>
-                        <b>{application.claim.claimAmount}</b>
-                      </td>
-                      <td>
-                        <b>
-                          <b>{application.claim.dateOfAccident}</b>
-                        </b>
-                      </td>
-
-                      <td>
-                        <b>
-                          {!application.claim.amtApprovedBySurveyor
-                            ? "NA"
-                            : application.claim.amtApprovedBySurveyor}
-                        </b>
-                      </td>
-                      <td>
-                        <b>
-                          <b>{application.claim.claimStatus}</b>
-                        </b>
-                      </td>
-                      <td>
-                        <b>
-                          <b>{application.claim.actionStatus}</b>
-                        </b>
-                      </td>
-                      <td>
-                        <b>
-                          <b>{application.claim.customerClaimResponse}</b>
-                        </b>
-                      </td>
-                      <td>
-                        {(() => {
-                          if (application.claim.actionStatus === "Pending") {
-                            return (
-                              <button
-                                onClick={() =>
-                                  assignClaimId(application.claim.id)
-                                }
-                                className="btn btn-sm bg-color custom-bg-text"
-                              >
-                                <b>Assign Surveyor</b>
-                              </button>
-                            );
-                          }
-                        })()}
-                      </td>
-                    </tr>
-                  );
-                })}
+                {applications.map((application) => (
+                  <tr key={application.claim.id}>
+                    <td><b>{application.policy.name}</b></td>
+                    <td><b>{`${application.customer.firstName} ${application.customer.lastName}`}</b></td>
+                    <td><b>{formatDateFromEpoch(application.claim.claimApplicationDate)}</b></td>
+                    <td><b>{application.claim.claimAmount}</b></td>
+                    <td><b>{application.claim.dateOfAccident}</b></td>
+                    <td><b>{!application.claim.amtApprovedBySurveyor ? "NA" : application.claim.amtApprovedBySurveyor}</b></td>
+                    <td><b>{application.claim.claimStatus}</b></td>
+                    <td><b>{application.claim.actionStatus}</b></td>
+                    <td><b>{application.claim.customerClaimResponse}</b></td>
+                    <td>
+                      {application.claim.actionStatus === "Pending" && (
+                        <button
+                          onClick={() => assignClaimId(application.claim.id)}
+                          className="btn btn-sm bg-color custom-bg-text"
+                        >
+                          <b>Assign Surveyor</b>
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -265,44 +181,31 @@ const ViewAllClaims = () => {
 
       <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton className="bg-color custom-bg-text">
-          <Modal.Title
-            style={{
-              borderRadius: "1em",
-            }}
-          >
-            Assign Surveyor
-          </Modal.Title>
+          <Modal.Title style={{ borderRadius: "1em" }}>Assign Surveyor</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="ms-3 mt-3 mb-3 me-3">
             <form>
-              <div className=" mb-3">
-                <label className="form-label">
-                  <b>Surveyor</b>
-                </label>
-
+              <div className="mb-3">
+                <label className="form-label"><b>Surveyor</b></label>
                 <select
-                  name="vehicleId"
+                  name="surveyorId"
                   onChange={(e) => setSurveyorId(e.target.value)}
                   className="form-control"
                 >
                   <option value="">Select Surveyor</option>
-
-                  {surveyors.map((surveyor) => {
-                    return (
-                      <option value={surveyor.user.id}>
-                        {surveyor.user.firstName}
-                      </option>
-                    );
-                  })}
+                  {surveyors.map((surveyor) => (
+                    <option key={surveyor.user.id} value={surveyor.user.id}>
+                      {surveyor.user.firstName}
+                    </option>
+                  ))}
                 </select>
               </div>
-
               <div className="d-flex aligns-items-center justify-content-center mb-2">
                 <button
                   type="submit"
                   onClick={updateClaim}
-                  class="btn bg-color custom-bg-text"
+                  className="btn bg-color custom-bg-text"
                 >
                   Assign Surveyor
                 </button>

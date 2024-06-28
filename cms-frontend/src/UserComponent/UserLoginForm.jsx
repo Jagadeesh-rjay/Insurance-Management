@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
 
 const UserLoginForm = () => {
-  const  api_Url = process.env.REACT_APP_API_URL
-  let navigate = useNavigate();
-console.log( api_Url)
+  const api_Url = process.env.REACT_APP_API_URL;
+
   const [loginRequest, setLoginRequest] = useState({
     emailId: "",
     password: "",

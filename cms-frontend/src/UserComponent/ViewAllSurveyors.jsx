@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import React from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 const ViewAllSurveyors = () => {
   const  api_Url = process.env.REACT_APP_API_URL
-  let navigate = useNavigate();
+  // let navigate = useNavigate();
 
   const [allCustomer, setAllCustomer] = useState([]);
   // const admin_jwtToken = sessionStorage.getItem("admin-jwtToken");
@@ -19,31 +19,28 @@ const ViewAllSurveyors = () => {
     };
 
     getAllUsers();
+    // eslint-disable-next-line
   }, []);
 
   const retrieveAllUser = async () => {
     const response = await axios.get(
       `${api_Url}/api/user/fetch/all?role=surveyor`,
-      {
-        headers: {
-          //   Authorization: "Bearer " + admin_jwtToken, // Replace with your actual JWT token
-        },
-      }
+      
     );
     console.log(response.data);
     return response.data;
   };
 
-  const formatDateFromEpoch = (epochTime) => {
-    const date = new Date(Number(epochTime));
-    const formattedDate = date.toLocaleString(); // Adjust the format as needed
+  // const formatDateFromEpoch = (epochTime) => {
+  //   const date = new Date(Number(epochTime));
+  //   const formattedDate = date.toLocaleString(); // Adjust the format as needed
 
-    return formattedDate;
-  };
+  //   return formattedDate;
+  // };
 
-  const viewProfile = (user) => {
-    navigate("/user/profile/detail", { state: user });
-  };
+  // const viewProfile = (user) => {
+  //   navigate("/user/profile/detail", { state: user });
+  // };
 
   return (
     <div className="mt-3">
@@ -69,7 +66,7 @@ const ViewAllSurveyors = () => {
           }}
         >
           <div className="table-responsive">
-            <table className="table table-hover text-color text-center">
+            <table className="table text-color text-center">
               <thead className="table-bordered border-color bg-color custom-bg-text">
                 <tr>
                   <th scope="col">First Name</th>

@@ -1,36 +1,29 @@
-import { useState, useEffect } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 const PolicyDetail = () => {
-  const  api_Url = process.env.REACT_APP_API_URL
+  const api_Url = process.env.REACT_APP_API_URL;
   let navigate = useNavigate();
-
   const { policyId } = useParams();
-
   const customer = JSON.parse(sessionStorage.getItem("active-customer"));
-
   const [policy, setPolicy] = useState({});
 
-  const retrievePolicy = async () => {
-    const response = await axios.get(
-      `${api_Url}/api/policy/fetch?policyId=` + policyId
-    );
-    return response.data;
-  };
-
   useEffect(() => {
-    const getAllPolicy = async () => {
-      const res = await retrievePolicy();
-      if (res) {
-        setPolicy(res.policies[0]);
+    const retrievePolicy = async () => {
+      try {
+        const response = await axios.get(`${api_Url}/api/policy/fetch?policyId=` + policyId);
+        setPolicy(response.data.policies[0]);
+      } catch (error) {
+        console.error("Error retrieving policy:", error);
+        // Handle error (e.g., show error message)
       }
     };
-    getAllPolicy();
-  }, []);
+
+    retrievePolicy();
+  }, [api_Url, policyId]);
 
   const applyPolicy = (policyId) => {
     if (!customer) {
@@ -63,7 +56,7 @@ const PolicyDetail = () => {
 
               setTimeout(() => {
                 navigate("/home");
-              }, 2000); // Redirect after 3 seconds
+              }, 2000); // Redirect after 2 seconds
             } else {
               toast.error(res.responseMessage, {
                 position: "top-center",
@@ -111,13 +104,9 @@ const PolicyDetail = () => {
                 <div className="card-body mt-3">
                   <h4 className="text-color">Policy Name: {policy.name}</h4>
                   <h4 className="text-color">Policy ID: {policy.policyId}</h4>
-                  <h5 className="header-logo-color">
-                    Description: {policy.description}
-                  </h5>
+                  <h5 className="header-logo-color">Description: {policy.description}</h5>
                   <h5 className="header-logo-color">Plan: {policy.plan}</h5>
-                  <h5 className="header-logo-color">
-                    Premium Amount: Rs. {policy.premiumAmount}
-                  </h5>
+                  <h5 className="header-logo-color">Premium Amount: Rs. {policy.premiumAmount}</h5>
                 </div>
                 <div className="card-footer mt-2 d-flex justify-content-center align-items-center">
                   <button
@@ -157,7 +146,7 @@ const PolicyDetail = () => {
                         {policy.coverageDetailsList &&
                           policy.coverageDetailsList.map((coverage) => {
                             return (
-                              <tr>
+                              <tr key={coverage.id}>
                                 <td>
                                   <b>{coverage.type}</b>
                                 </td>

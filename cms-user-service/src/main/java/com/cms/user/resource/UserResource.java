@@ -49,7 +49,7 @@ public class UserResource {
 	private JwtUtil jwtUtil;
 
 	ObjectMapper objectMapper = new ObjectMapper();
-	
+
 	public ResponseEntity<CommonApiResponse> registerAdmin(UserRegisterDto userRegisterDto) {
 
 		CommonApiResponse response = new CommonApiResponse();
@@ -57,7 +57,6 @@ public class UserResource {
 		if (userRegisterDto == null) {
 			response.setResponseMessage("bad request - missing input");
 			response.setSuccess(false);
-
 			return new ResponseEntity<CommonApiResponse>(response, HttpStatus.BAD_REQUEST);
 		}
 
@@ -67,16 +66,13 @@ public class UserResource {
 		if (existingUser != null) {
 			response.setResponseMessage("Admin with this email id already registered");
 			response.setSuccess(false);
-
 			return new ResponseEntity<CommonApiResponse>(response, HttpStatus.BAD_REQUEST);
 		}
 
-		User user = new User();
-        user.setEmailId(userRegisterDto.getEmailId());
+		User user = UserRegisterDto.toEntity(userRegisterDto);
 		user.setStatus(UserStatus.ACTIVE.value());
 
 		String encodedPassword = passwordEncoder.encode(userRegisterDto.getPassword());
-
 		user.setPassword(encodedPassword);
 
 		existingUser = this.userService.registerUser(user);
@@ -84,13 +80,11 @@ public class UserResource {
 		if (existingUser == null) {
 			response.setResponseMessage("failed to register admin");
 			response.setSuccess(false);
-
 			return new ResponseEntity<CommonApiResponse>(response, HttpStatus.BAD_REQUEST);
 		}
 
 		response.setResponseMessage("Admin registered Successfully");
 		response.setSuccess(true);
-
 		return new ResponseEntity<CommonApiResponse>(response, HttpStatus.OK);
 	}
 
@@ -312,8 +306,8 @@ public class UserResource {
 		List<UserList> users = new ArrayList<>();
 
 		List<User> listOfUser = this.userService.getUsersByRoleAndStatus(role, UserStatus.ACTIVE.value());
-		
-		if(CollectionUtils.isEmpty(listOfUser)) {
+
+		if (CollectionUtils.isEmpty(listOfUser)) {
 			response.setResponseMessage("No Users found!!!");
 			response.setSuccess(false);
 

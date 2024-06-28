@@ -9,7 +9,7 @@ const ViewPolicyApplication = () => {
   const customer = JSON.parse(sessionStorage.getItem("active-customer"));
 
   const [applications, setApplications] = useState([]);
-  const admin_jwtToken = sessionStorage.getItem("admin-jwtToken");
+
 
   useEffect(() => {
     const getApplication = async () => {
@@ -20,6 +20,7 @@ const ViewPolicyApplication = () => {
     };
 
     getApplication();
+    // eslint-disable-next-line
   }, []);
 
   const retrieveApplication = async () => {
